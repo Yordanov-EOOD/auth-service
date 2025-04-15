@@ -16,6 +16,14 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
         
+      - name: Create default .env file
+        run: |
+          echo "# Default environment variables for CI/CD" > .env
+          echo "AUTH_DB_USER=postgres" >> .env
+          echo "AUTH_DB_NAME=auth" >> .env
+          echo "ACCESS_TOKEN_SECRET=${{ secrets.ACCESS_TOKEN_SECRET || 'default_access_token_secret' }}" >> .env
+          echo "REFRESH_TOKEN_SECRET=${{ secrets.REFRESH_TOKEN_SECRET || 'default_refresh_token_secret' }}" >> .env
+        
       - name: Login to DockerHub
         uses: docker/login-action@v2
         with:
@@ -30,3 +38,5 @@ jobs:
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/auth-service:latest
           cache-from: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/auth-service:buildcache
           cache-to: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/auth-service:buildcache,mode=max
+
+          

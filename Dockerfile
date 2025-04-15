@@ -20,7 +20,9 @@ RUN npm ci --include=dev
 RUN npx prisma generate
 
 COPY src/ ./src
-COPY .env ./.env
+
+# Create a default .env file if none exists
+RUN touch .env
 
 # Stage 2: Production image
 FROM node:18-slim
@@ -41,8 +43,4 @@ COPY --from=builder /app/src ./src
 COPY --from=builder /app/.env ./
 
 # Startup command
-CMD sh -c "\
-  while ! pg_isready -h auth-db -U \$AUTH_DB_USER -d \$AUTH_DB_NAME; \
-  do echo 'Waiting for database...'; sleep 2; done \
-  && npx prisma migrate deploy \
-  && node src/index.js"
+CMD ["sh", "-c", "while ! pg_isready -h auth-db -U $AUTH_DB_USER -d $AUTH_DB_NAME; do echo 'Waiting for database...'; sleep 2; done && npx prisma migrate deploy && node src/index.js"]
