@@ -12,9 +12,11 @@ const app = express();
 
 // Enable credentials for JWT cookies
 app.use(cors({
-  origin: ['http://localhost:3000', 'http://api-gateway:80'],
-  methods: ['GET', 'POST'],
-  credentials: true
+  origin: ['http://localhost', 'http://localhost:3000', 'http://api-gateway:80', 'http://localhost:8080'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  credentials: true,
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  exposedHeaders: ['Content-Length', 'X-Powered-By']
 }));
 
 // Required for refresh token cookies

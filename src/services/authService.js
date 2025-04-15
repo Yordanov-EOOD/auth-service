@@ -5,7 +5,15 @@ import 'dotenv/config';
 
 export const loginUserService = async (email, password) => {
   // Validate credentials
-  const user = await prisma.user.findUnique({ where: { email } });
+  const user = await prisma.user.findUnique({ 
+    where: { email },
+    select: {
+      id: true,
+      email: true,
+      password: true
+    }
+  });
+  
   if (!user) throw new Error('Invalid credentials');
   
   const passwordValid = await bcrypt.compare(password, user.password);
@@ -29,27 +37,45 @@ export const loginUserService = async (email, password) => {
     where: { userId: user.id },
     update: { 
       token: refreshToken,
-      expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000) // 1 day
+      valid: true,
+      expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000)
     },
     create: {
       token: refreshToken,
       type: 'refresh',
+      valid: true,
       userId: user.id,
       expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000)
     }
   });
 
-  return { 
-    accessToken, 
+  // Return response with user data
+  return {
+    accessToken,
     refreshToken,
-    userId: user.id 
+    user: {
+      id: user.id,
+      email: user.email
+    }
   };
 };
 
 export const verifyTokenService = async (token) => {
   try {
     const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
-    return { valid: true, user: decoded };
+    const user = await prisma.user.findUnique({
+      where: { id: decoded.userId },
+      select: {
+        id: true,
+        email: true
+      }
+    });
+    
+    if (!user) {
+      return { valid: false, error: 'User not found' };
+    }
+
+    return { valid: true, user };
   } catch (error) {
     return { valid: false, error: error.message };
   }
