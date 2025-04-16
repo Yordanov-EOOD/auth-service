@@ -33,6 +33,10 @@ app.use('/logout', verifyJWT, logoutRoute); // Requires valid JWT
 app.use(errorHandler);
 
 const PORT = 3000;
+
+// Health check endpoint
+app.get('/auth/health', (req, res) => res.send('OK'));
+
 app.listen(PORT, () => {
   console.log(`Auth Service: ${PORT}`);
 });
