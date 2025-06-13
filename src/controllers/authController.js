@@ -28,6 +28,7 @@ const handleLogin = async (req, res) => {
     res.json({ 
       success: true,
       accessToken,
+      refreshToken,
       user: {
         id: user.id,
         email: user.email,

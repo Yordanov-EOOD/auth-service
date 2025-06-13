@@ -12,7 +12,11 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-        
+
+      # Clone shared dependency into workspace
+      - name: Clone shared dependency
+        run: git clone https://github.com/your-org/shared.git shared
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
         
@@ -39,4 +43,3 @@ jobs:
           cache-from: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/auth-service:buildcache
           cache-to: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/auth-service:buildcache,mode=max
 
-          
