@@ -23,10 +23,16 @@ jobs:
       - name: Create default .env file
         run: |
           echo "# Default environment variables for CI/CD" > .env
-          echo "AUTH_DB_USER=postgres" >> .env
-          echo "AUTH_DB_NAME=auth" >> .env
+          echo "AUTH_DB_USER=${{ secrets.AUTH_DB_USER || 'auth_user' }}" >> .env
+          echo "AUTH_DB_PASS=${{ secrets.AUTH_DB_PASS || 'auth_pass' }}" >> .env
+          echo "AUTH_DB_NAME=${{ secrets.AUTH_DB_NAME || 'auth' }}" >> .env
+          echo "DATABASE_URL=${{ secrets.DATABASE_URL || 'postgresql://auth_user:auth_pass@auth-db:5432/auth?schema=public' }}" >> .env
           echo "ACCESS_TOKEN_SECRET=${{ secrets.ACCESS_TOKEN_SECRET || 'default_access_token_secret' }}" >> .env
           echo "REFRESH_TOKEN_SECRET=${{ secrets.REFRESH_TOKEN_SECRET || 'default_refresh_token_secret' }}" >> .env
+          echo "NODE_ENV=production" >> .env
+          echo "PORT=3000" >> .env
+          echo "KAFKA_BROKER=${{ secrets.KAFKA_BROKER || 'kafka:9092' }}" >> .env
+          echo "KAFKA_CLIENT_ID=auth-service" >> .env
         
       - name: Login to DockerHub
         uses: docker/login-action@v2
@@ -38,7 +44,7 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           context: .
-          file: auth-service/Dockerfile.ci
+          file: Dockerfile.ci
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/auth-service:latest
           cache-from: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/auth-service:buildcache
