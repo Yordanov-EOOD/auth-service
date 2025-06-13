@@ -36,20 +36,20 @@ export const getExpirationTime = (expiration) => {
   const unit = expiration.slice(-1);
 
   switch (unit) {
-    case 'd':
-      milliseconds = value * 24 * 60 * 60 * 1000;
-      break;
-    case 'h':
-      milliseconds = value * 60 * 60 * 1000;
-      break;
-    case 'm':
-      milliseconds = value * 60 * 1000;
-      break;
-    case 's':
-      milliseconds = value * 1000;
-      break;
-    default:
-      milliseconds = 7 * 24 * 60 * 60 * 1000; // Default 7 days
+  case 'd':
+    milliseconds = value * 24 * 60 * 60 * 1000;
+    break;
+  case 'h':
+    milliseconds = value * 60 * 60 * 1000;
+    break;
+  case 'm':
+    milliseconds = value * 60 * 1000;
+    break;
+  case 's':
+    milliseconds = value * 1000;
+    break;
+  default:
+    milliseconds = 7 * 24 * 60 * 60 * 1000; // Default 7 days
   }
 
   // Cache the calculation

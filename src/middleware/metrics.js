@@ -95,7 +95,7 @@ export const metricsMiddleware = (req, res, next) => {
     httpRequestTotal
       .labels(req.method, path, res.statusCode)
       .inc();
-      // Update CPU and memory usage periodically
+    // Update CPU and memory usage periodically
     const usage = process.memoryUsage();
     const memoryUsedMB = usage.rss / 1024 / 1024;
     const totalMemoryMB = os.totalmem() / 1024 / 1024;
@@ -114,7 +114,7 @@ export const metricsMiddleware = (req, res, next) => {
 // Function to track auth operations
 export const trackAuthOperation = (operation, status) => {
   authOperationsTotal.labels(operation, status).inc();
-    // Update CPU and memory usage
+  // Update CPU and memory usage
   const usage = process.memoryUsage();
   const memoryUsedMB = usage.rss / 1024 / 1024;
   const totalMemoryMB = os.totalmem() / 1024 / 1024;

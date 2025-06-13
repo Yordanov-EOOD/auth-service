@@ -2,36 +2,36 @@ import rateLimit from 'express-rate-limit';
 
 // Create rate limiter with memory store
 const createRateLimiter = (options) => {  const config = {
-    windowMs: options.windowMs,
-    max: options.max,
-    message: {
+  windowMs: options.windowMs,
+  max: options.max,
+  message: {
+    error: options.message || 'Too many requests, please try again later',
+    retryAfter: options.windowMs / 1000
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+  // Custom key generator to include IP and optionally email
+  keyGenerator: (req) => {
+    const ip = req.ip || req.connection.remoteAddress;
+    const email = req.body?.email;
+    return email ? `${ip}:${email}` : ip;
+  },
+  // Skip successful requests in count for login attempts
+  skipSuccessfulRequests: options.skipSuccessfulRequests || false,
+  handler: (req, res) => {
+    console.warn(`Rate limit exceeded for ${req.ip}`, {
+      endpoint: req.path,
+      userAgent: req.get('User-Agent'),
+      timestamp: new Date().toISOString()
+    });
+    res.status(429).json({
       error: options.message || 'Too many requests, please try again later',
       retryAfter: options.windowMs / 1000
-    },
-    standardHeaders: true,
-    legacyHeaders: false,
-    // Custom key generator to include IP and optionally email
-    keyGenerator: (req) => {
-      const ip = req.ip || req.connection.remoteAddress;
-      const email = req.body?.email;
-      return email ? `${ip}:${email}` : ip;
-    },
-    // Skip successful requests in count for login attempts
-    skipSuccessfulRequests: options.skipSuccessfulRequests || false,
-    handler: (req, res) => {
-      console.warn(`Rate limit exceeded for ${req.ip}`, {
-        endpoint: req.path,
-        userAgent: req.get('User-Agent'),
-        timestamp: new Date().toISOString()
-      });
-      res.status(429).json({
-        error: options.message || 'Too many requests, please try again later',
-        retryAfter: options.windowMs / 1000
-      });
-    }
-  };
+    });
+  }
+};
 
-  return rateLimit(config);
+return rateLimit(config);
 };
 
 // Strict rate limiting for authentication endpoints (prevent brute force)

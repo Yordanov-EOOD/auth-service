@@ -33,7 +33,7 @@ export const handleNewUser = async (req, res) => {
     // Register user and get response including tokens and user info
     logger.info('Attempting user registration', { username, email });
     const result = await createUserService({ username, email, password });
-      logger.info('User registration completed', { 
+    logger.info('User registration completed', { 
       id: result.id, 
       email: result.email,
       partialSuccess: result.partialSuccess || false,
@@ -44,7 +44,7 @@ export const handleNewUser = async (req, res) => {
     
     // Track registration operation
     trackAuthOperation('registration', result.partialSuccess ? 'partial' : 'success');
-      // Publish event to Kafka regardless of partial success
+    // Publish event to Kafka regardless of partial success
     try {
       const producer = await getAuthServiceProducer();
       await producer.publishMessage(
@@ -68,7 +68,7 @@ export const handleNewUser = async (req, res) => {
         stack: kafkaError.stack
       });
     }
-      // Handle partial success (user created in auth DB but failed in other services)
+    // Handle partial success (user created in auth DB but failed in other services)
     if (result.partialSuccess) {
       // Still set refresh token if we have one
       if (result.refreshToken) {
@@ -106,21 +106,21 @@ export const handleNewUser = async (req, res) => {
       user: result.user || { id: result.id, email: result.email, username }
     });
   } catch (error) {    logger.error('Registration error', {
-      error: error.message,
-      stack: error.stack,
-      email,
-      username,
-      ip: req.ip,
-      duration: Date.now() - startTime,
-      timestamp: new Date().toISOString()
-    });
+    error: error.message,
+    stack: error.stack,
+    email,
+    username,
+    ip: req.ip,
+    duration: Date.now() - startTime,
+    timestamp: new Date().toISOString()
+  });
     
-    // Track failed registration
-    trackAuthOperation('registration', 'failure');
+  // Track failed registration
+  trackAuthOperation('registration', 'failure');
     
-    res.status(400).json({ 
-      success: false,
-      error: error.message 
-    });
+  res.status(400).json({ 
+    success: false,
+    error: error.message 
+  });
   }
 };

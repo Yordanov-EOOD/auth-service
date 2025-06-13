@@ -11,11 +11,10 @@ process.env.ACCESS_TOKEN_SECRET = 'test-access-token-secret';
 try {
   dotenv.config({ path: '.env.test' });
 } catch (error) {
-  console.log('No .env.test file found, using default test values');
+  console.log('No .env.test file found, using default test values: ' + error.message);
 }
 
-// Store original console.log for restoration if needed
-const originalConsoleLog = console.log;
+
 
 // Add any global test setup here
 beforeAll(async () => {
